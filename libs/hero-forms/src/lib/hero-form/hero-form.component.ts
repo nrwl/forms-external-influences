@@ -1,11 +1,11 @@
-import { Component, OnDestroy, EventEmitter } from '@angular/core';
+import { Component, OnDestroy, EventEmitter, Output } from '@angular/core';
 import {
   ControlValueAccessor,
   FormGroup,
   NG_VALUE_ACCESSOR
 } from '@angular/forms';
 import { Subject } from 'rxjs';
-import { startWith, takeUntil, tap } from 'rxjs/operators';
+import { startWith, takeUntil, tap, mapTo, map } from 'rxjs/operators';
 import { createHeroFormGroup, Hero } from '../hero-forms.utils';
 
 @Component({
@@ -25,12 +25,13 @@ export class HeroFormComponent implements OnDestroy, ControlValueAccessor {
   private _destroying = new Subject<void>();
   form: FormGroup;
   id = HeroFormComponent.COUNT++;
-  nameEnabled = new EventEmitter<boolean>();
+  @Output() nameEnabled;
 
   toggleNameEnabled() {
     const nameControl = this.form.get('name');
-    nameControl.enabled ? nameControl.disable() : nameControl.enable();
-    this.nameEnabled.emit(nameControl.enabled);
+    nameControl.enabled
+      ? nameControl.disable({ emitEvent: true })
+      : nameControl.enable({ emitEvent: true });
   }
 
   writeValue(v: Hero) {
@@ -38,7 +39,13 @@ export class HeroFormComponent implements OnDestroy, ControlValueAccessor {
       this.form.setValue(v);
     } else {
       this.form = createHeroFormGroup(v);
-      this.nameEnabled.emit(true);
+      this.nameEnabled = this.form.get('name').valueChanges.pipe(
+        startWith(this.form.get('name').value),
+        tap(() => console.log('emit')),
+        tap(() => console.log(this.form.get('name'))),
+        takeUntil(this._destroying),
+        map(() => this.form.get('name').enabled)
+      );
     }
   }
 
