@@ -1,0 +1,38 @@
+<form *ngIf="form" [formGroup]="form">
+  <fieldset>
+    <legend>{{ form.get('name').value || 'Hero Form' }}</legend>
+
+    <label [for]="'name-' + id">Hero Name: </label>
+    <input type="text" formControlName="name" [id]="'name-' + id" />
+
+    <form formGroupName="stats">
+      <fieldset>
+        <legend>Hero Stats</legend>
+
+        <div>
+          <label [for]="'attack-' + id">Attack: </label>
+          <input type="number" formControlName="attack" [id]="'attack-' + id" />
+        </div>
+
+        <div>
+          <label [for]="'defense-' + id">Defense: </label>
+          <input
+            type="number"
+            formControlName="defense"
+            [id]="'defense-' + id"
+          />
+        </div>
+
+        <div>
+          <label [for]="'speed-' + id">Speed: </label>
+          <input type="number" formControlName="speed" [id]="'speed-' + id" />
+        </div>
+
+        <div>
+          <label [for]="'health-' + id">Health: </label>
+          <input type="number" formControlName="health" [id]="'health-' + id" />
+        </div>
+      </fieldset>
+    </form>
+  </fieldset>
+</form>
